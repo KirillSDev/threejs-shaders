@@ -1,4 +1,11 @@
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import './styles.scss'
+
+
+// Canvas
+const canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
+const scene = new THREE.Scene();
 
 
 const parameters = {
@@ -6,21 +13,35 @@ const parameters = {
     height: window.innerHeight,
 }
 
-const canvas = document.querySelector("webgl");
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera();
-
-
-scene.add(camera);
-
-const planeGeometry = new THREE.PlaneGeometry(10, 10);
-const material = new THREE.MeshStandardMaterial({
-    color: 0xffffff,
+// Object
+const planeGeometry = new THREE.PlaneGeometry(2, 2, 32, 32);
+const material = new THREE.MeshBasicMaterial({
+    color: '#ffffff',
 })
 const planeMesh = new THREE.Mesh(planeGeometry, material);
 
+scene.add(planeMesh);
 
+// Camera
+const camera = new THREE.PerspectiveCamera(75, parameters.width / parameters.height);
+camera.position.z = 3;
+camera.position.y = 0.5;
 
-
-const renderer = new THREE.WebGL1Renderer({canvas})
+scene.add(camera)
+// Renderer
+const renderer = new THREE.WebGL1Renderer({
+    canvas
+})
 renderer.setSize(parameters.width, parameters.height);
+const controls = new OrbitControls( camera, canvas );
+
+
+renderer.render(scene, camera);
+
+
+const tick = () => {
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+}
+tick();
